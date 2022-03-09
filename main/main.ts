@@ -1,8 +1,9 @@
 /**
  * Entry of electron app
  */
-import { app, BrowserWindow, screen as electronScreen } from 'electron';
-import { isDevelopment, resolveHtmlPath } from './util';
+import { app, BrowserWindow, ipcMain, screen as electronScreen } from 'electron';
+import path from 'path';
+import { isDevelopment, logger, resolveHtmlPath } from './util';
 
 // Only allow one app at a time.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -32,6 +33,15 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+// Example of how to receive messages from renderer process and reply.
+ipcMain.on('ping', (event) => {
+  logger.debug('Received ping from renderer process.');
+  event.sender.send('pong', 'pong');
+  // Alternatively:
+  // mainWindow.webContents.send('pong', 'pong');
+});
+
+// Initialize main window
 const createMainWindow = async () => {
   if (isDevelopment) {
     await installExtensions();
@@ -45,7 +55,8 @@ const createMainWindow = async () => {
     icon: 'public/logo512.png',
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.resolve(__dirname, 'preload.js')
     }
   });
 
