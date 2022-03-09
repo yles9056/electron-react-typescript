@@ -3,9 +3,6 @@
  */
 import { app, BrowserWindow, screen as electronScreen } from 'electron';
 import { isDevelopment, resolveHtmlPath } from './util';
-import { test } from './test';
-
-test();
 
 // Only allow one app at a time.
 const gotTheLock = app.requestSingleInstanceLock();
