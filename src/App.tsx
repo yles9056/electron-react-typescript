@@ -1,8 +1,8 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import IpcExample from './examples/IpcExample';
-import TranslationExample from './examples/TranslationExample';
+import IpcExample from './components/examples/IpcExample';
+import TranslationExample from './components/examples/TranslationExample';
 
 function App() {
   return (

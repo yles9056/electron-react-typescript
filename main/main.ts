@@ -3,6 +3,7 @@
  */
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import settings from 'electron-settings';
+import windowStateKeeper from 'electron-window-state';
 import path from 'path';
 import { isDevelopment, logger, resolveHtmlPath } from './util';
 
@@ -66,9 +67,17 @@ const createMainWindow = async () => {
     await installExtensions();
   }
 
+  // Store and restore window sizes and positions
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: screen.getPrimaryDisplay().workArea.width,
+    defaultHeight: screen.getPrimaryDisplay().workArea.height
+  });
+
   let mainWindow = new BrowserWindow({
-    width: screen.getPrimaryDisplay().workArea.width,
-    height: screen.getPrimaryDisplay().workArea.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     show: false,
     backgroundColor: 'white',
     icon: 'public/logo512.png',
