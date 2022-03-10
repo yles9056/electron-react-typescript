@@ -72,7 +72,7 @@ export const logger = createLogger({
       filename: `${app.getName()}-%DATE%.log`,
       dirname: isDevelopment
         ? path.resolve(__dirname, '..', 'log')
-        : path.resolve(app.getPath('userData')),
+        : path.resolve(app.getPath('userData'), 'log'),
       datePattern: 'YYYY-MM-DD-HH',
       frequency: '1h',
       maxSize: '20m',

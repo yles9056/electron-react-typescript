@@ -31,14 +31,14 @@ export interface IElectron {
      * @param listener Listener function.
      * @returns A function that removes the listener when called.
      */
-    on: (channel: string, func: (...args: any[]) => void) => () => void;
+    on: (channel: string, listener: (...args: any[]) => void) => () => void;
     /**
      * Add a listener that listens to a channel. Only trigger once.
      * @param channel The channel to listen to.
      * @param listener Listener function.
      * @returns A function that removes the listener when called.
      */
-    once: (channel: string, func: (...args: any[]) => void) => () => void;
+    once: (channel: string, listener: (...args: any[]) => void) => () => void;
     /**
      * Sends args to main process via ipcRenderer.send()
      * @param channel

@@ -1,7 +1,8 @@
 /**
  * Entry of electron app
  */
-import { app, BrowserWindow, ipcMain, screen as electronScreen } from 'electron';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
+import settings from 'electron-settings';
 import path from 'path';
 import { isDevelopment, logger, resolveHtmlPath } from './util';
 
@@ -20,6 +21,32 @@ if (isDevelopment) {
   });
 }
 
+/**
+ * Initialize setting file
+ */
+const initSettingsFile = () => {
+  // Configure setting file location and format
+  settings.configure({
+    dir: isDevelopment
+      ? path.resolve(__dirname, '..', 'config')
+      : path.resolve(app.getPath('userData'), 'config'),
+    fileName: `${app.getName()}_settings.json`,
+    numSpaces: 2,
+    prettify: true
+  });
+
+  // Test if the setting file can be loaded properly.
+  // If fail, reset the setting file.
+  try {
+    settings.getSync();
+  } catch (e) {
+    logger.error(`Error when loading settings: ${e}`);
+    settings.setSync({});
+  }
+};
+
+initSettingsFile();
+
 // Install react developer extension
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -33,14 +60,6 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-// Example of how to receive messages from renderer process and reply.
-ipcMain.on('ping', (event) => {
-  logger.debug('Received ping from renderer process.');
-  event.sender.send('pong', 'pong');
-  // Alternatively:
-  // mainWindow.webContents.send('pong', 'pong');
-});
-
 // Initialize main window
 const createMainWindow = async () => {
   if (isDevelopment) {
@@ -48,8 +67,8 @@ const createMainWindow = async () => {
   }
 
   let mainWindow = new BrowserWindow({
-    width: electronScreen.getPrimaryDisplay().workArea.width,
-    height: electronScreen.getPrimaryDisplay().workArea.height,
+    width: screen.getPrimaryDisplay().workArea.width,
+    height: screen.getPrimaryDisplay().workArea.height,
     show: false,
     backgroundColor: 'white',
     icon: 'public/logo512.png',
@@ -70,6 +89,14 @@ const createMainWindow = async () => {
     //mainWindow = null;
   });
 };
+
+// Example of how to receive messages from renderer process and reply.
+ipcMain.on('ping', (event) => {
+  logger.debug('Received ping from renderer process.');
+  event.sender.send('pong', 'pong');
+  // Alternatively:
+  // mainWindow.webContents.send('pong', 'pong');
+});
 
 app.whenReady().then(() => {
   createMainWindow();
