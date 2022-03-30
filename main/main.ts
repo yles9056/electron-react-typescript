@@ -4,8 +4,11 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import settings from 'electron-settings';
 import windowStateKeeper from 'electron-window-state';
+import _ from 'lodash';
 import path from 'path';
 import { isDevelopment, logger, resolveHtmlPath } from './util';
+
+let mainWindow: BrowserWindow;
 
 // Only allow one app at a time.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -73,7 +76,7 @@ const createMainWindow = async () => {
     defaultHeight: screen.getPrimaryDisplay().workArea.height
   });
 
-  let mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -115,6 +118,16 @@ app.whenReady().then(() => {
       createMainWindow();
     }
   });
+});
+
+app.on('second-instance', (event, commandLine, workingDirectory) => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (!_.isNil(mainWindow)) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+    mainWindow.focus();
+  }
 });
 
 app.on('window-all-closed', () => {
